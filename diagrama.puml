@@ -1,0 +1,87 @@
+@startuml Gestao de Portfolio de Investimentos
+
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+skinparam backgroundColor #FAFAFA
+skinparam class {
+    BackgroundColor #EAF2FB
+    BorderColor #2E86C1
+    ArrowColor #1A5276
+    HeaderBackgroundColor #2E86C1
+    HeaderFontColor #FFFFFF
+}
+skinparam package {
+    BackgroundColor #EBF5FB
+    BorderColor #5DADE2
+    FontStyle bold
+}
+
+title Sistema de Gestão de Portfólio de Investimentos\n
+
+package "ativo" {
+    interface Ativo {
+        + getNome() : String
+        + getValorTotal() : double
+        + exibir(indentacao : String) : void
+    }
+
+    class AtivoIndividual {
+        - nome : String
+        - tipo : String
+        - quantidade : int
+        - precoUnitario : double
+        --
+        + AtivoIndividual(nome, tipo, quantidade, precoUnitario)
+        + getNome() : String
+        + getValorTotal() : double
+        + getTipo() : String
+        + getQuantidade() : int
+        + getPrecoUnitario() : double
+        + exibir(indentacao : String) : void
+    }
+
+    Ativo <|.. AtivoIndividual
+}
+
+package "carteira" {
+    class CarteiraInvestimentos {
+        - nome : String
+        - responsavel : String
+        - componentes : List<Ativo>
+        --
+        + CarteiraInvestimentos(nome, responsavel)
+        + adicionar(ativo : Ativo) : void
+        + remover(ativo : Ativo) : void
+        + getComponentes() : List<Ativo>
+        + getResponsavel() : String
+        + getTotalAtivos() : int
+        + getNome() : String
+        + getValorTotal() : double
+        + exibir(indentacao : String) : void
+    }
+
+    Ativo <|.. CarteiraInvestimentos
+    CarteiraInvestimentos o-- "0..*" Ativo : componentes >
+}
+
+class Main {
+    + {static} main(args : String[]) : void
+}
+
+Main --> CarteiraInvestimentos : monta portfólio >
+Main --> AtivoIndividual       : cria ativos >
+
+note right of CarteiraInvestimentos
+  CarteiraInvestimentos (Composite)
+  e AtivoIndividual (Leaf) implementam
+  a mesma interface Ativo.
+  ---
+  getValorTotal() percorre
+  recursivamente todos os níveis,
+  consolidando o patrimônio total.
+  ---
+  Tipos suportados:
+  ACAO | FII | RENDA_FIXA | CRIPTO
+end note
+
+@enduml
